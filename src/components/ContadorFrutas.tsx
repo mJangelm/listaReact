@@ -1,14 +1,14 @@
-interface ContadorFrutasProps {
+interface ContadorCancionesProps {
   numero: number;
 }
 
-function ContadorFrutas({ numero }: ContadorFrutasProps) {
+function ContadorCanciones({ numero }: ContadorCancionesProps) {
   const renderMensaje = () => {
     if (numero > 0) {
-      return <p>Hay {numero} frutas</p>;
+      return <p>Hay {numero} canciones</p>;
     }
-    return <p>Cesta vacía</p>;
+    return <p>No hay canciones</p>;
   };
   return <p>{renderMensaje()}</p>;
 }
-export default ContadorFrutas;
+export default ContadorCanciones;

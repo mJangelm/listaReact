@@ -3,12 +3,12 @@ import Todo from "./components/Todo";
 import Toggle from "./components/Toggle";
 import Contador from "./components/Contador";
 import Formulario from "./components/Formulario";
-import ListasFruta from "./components/listasFruta";
+import ListasTracks from "./components/listaTracks";
 
 function App() {
   return (
     <div>
-      <ListasFruta />
+      <ListasTracks />
     </div>
   );
 }
