@@ -3,8 +3,8 @@ import ItemTrack from "./itemTrack";
 import ContadorFrutas from "./ContadorFrutas";
 
 interface Track {
-  id: number;
-  titulo: string;
+  idTrack: number;
+  title: string;
   bpm: number;
 }
 
@@ -13,15 +13,28 @@ function ListasTracks() {
     const guardado = localStorage.getItem("mis_tracks");
     return guardado ? JSON.parse(guardado) : [];
   });
-  const [titulo, setTitulo] = useState("");
+  const [title, setTitulo] = useState("");
   const [edit, setEdit] = useState<number | null>(null);
   const [bpm, setBpm] = useState(120);
   const [cargando, setCargando] = useState(true);
 
   // Solo necesitamos este para guardar cada vez que cambie la lista
-  useEffect(() => {
+  /*   useEffect(() => {
     localStorage.setItem("mis_tracks", JSON.stringify(tracks));
-  }, [tracks]);
+  }, [tracks]); */
+
+  useEffect(() => {
+    fetch("http://localhost:8087")
+      .then((res) => res.json())
+      .then((data) => {
+        setTracks(data);
+        setCargando(false);
+      })
+      .catch((err) => {
+        console.error("Error conectando con Java:", err);
+        setCargando(false);
+      });
+  }, []);
 
   // Tu useEffect del "Cargando" ahora solo sirve para el efecto visual
   useEffect(() => {
@@ -31,27 +44,68 @@ function ListasTracks() {
   }, []);
 
   const añadirTrack = () => {
-    if (titulo.trim() === "") return;
+    // 1. Validación simple para no enviar campos vacíos
+    if (title.trim() === "") {
+      alert("El título no puede estar vacío");
+      return;
+    }
 
-    const nuevoTrack: Track = {
-      id: Date.now(),
-      titulo: titulo,
+    // 2. Creamos el objeto con los nombres exactos que espera Java
+    const nuevoTrack = {
+      title: title,
       bpm: bpm,
     };
 
-    setTracks([...tracks, nuevoTrack]);
-    setTitulo("");
-    setBpm(120);
-  };
+    // 3. Petición POST al servidor
+    fetch("http://localhost:8087/alta", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(nuevoTrack),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          // Si el servidor responde con error (ej. 409 o 400)
+          throw new Error("Error en el servidor al añadir el track");
+        }
+        return res.json();
+      })
+      .then((trackGuardado) => {
+        // 4. Actualizamos el estado de React con el objeto que viene de la DB
+        // Este objeto ya incluye el idTrack real generado por MySQL
+        setTracks([...tracks, trackGuardado]);
 
+        // 5. Limpiamos los inputs
+        setTitulo("");
+        setBpm(120);
+      })
+      .catch((err) => {
+        console.error("Hubo un problema con la operación fetch:", err);
+        alert(
+          "No se pudo conectar con el servidor. Revisa si Java está corriendo.",
+        );
+      });
+  };
   const borrarTrack = (idABorrar: number) => {
-    setTracks(tracks.filter((track) => track.id !== idABorrar));
+    // 1. Llamada a la API
+    fetch(`http://localhost:8087/${idABorrar}`, {
+      method: "DELETE",
+    })
+      .then((res) => {
+        if (res.ok) {
+          // 2. Si Java dice OK, lo quitamos de la vista de React
+          setTracks(tracks.filter((track) => track.idTrack !== idABorrar));
+        } else {
+          alert("No se pudo borrar el track en el servidor");
+        }
+      })
+      .catch((err) => console.error("Error al borrar:", err));
   };
-
   const prepararEdicion = (track: Track) => {
-    setTitulo(track.titulo); // El nombre de la canción sube al input
+    setTitulo(track.title); // El nombre de la canción sube al input
     setBpm(track.bpm); // El BPM sube al input
-    setEdit(track.id); // Guardamos el ID para saber que ESTAMOS EDITANDO
+    setEdit(track.idTrack); // Guardamos el ID para saber que ESTAMOS EDITANDO
   };
 
   const cancelar = () => {
@@ -62,9 +116,9 @@ function ListasTracks() {
   const guardarCambios = () => {
     // 1. Buscamos en la lista y actualizamos el que coincida
     const tracksActualizados = tracks.map((t) => {
-      if (t.id === edit) {
+      if (t.idTrack === edit) {
         // Si este es el que estamos editando, devolvemos los datos nuevos de los inputs
-        return { ...t, titulo: titulo, bpm: bpm };
+        return { ...t, titulo: title, bpm: bpm };
       }
       return t; // Si no es el que editamos, lo dejamos tal cual
     });
@@ -92,7 +146,7 @@ function ListasTracks() {
           className="form-control"
           type="text"
           placeholder="Nombre del track"
-          value={titulo}
+          value={title}
           onChange={(e) => setTitulo(e.target.value)}
           onKeyDown={
             edit
@@ -129,11 +183,11 @@ function ListasTracks() {
         <tbody>
           {tracks.map((track) => (
             <ItemTrack
-              key={track.id}
-              id={track.id}
-              titulo={track.titulo}
+              key={track.idTrack}
+              id={track.idTrack}
+              titulo={track.title}
               bpm={track.bpm}
-              onBorrar={() => borrarTrack(track.id)}
+              onBorrar={() => borrarTrack(track.idTrack)}
               onEditar={() => prepararEdicion(track)}
             />
           ))}
