@@ -40,3 +40,68 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Colores de la paleta: 
+   Oscuro: #2b1d12 (Café muy oscuro)
+   Medio: #4e342e (Marrón cálido)
+   Acento: #8d6e63 (Marrón suave/cuero)
+*/
+
+html,
+body,
+#root {
+  background-color: #1a120b !important; /* El marrón casi negro que elegimos */
+  margin: 0;
+  margin-left: 5vh;
+  padding: 0;
+  min-height: 100%;
+  width: 100%;
+}
+
+.card-estudio {
+  background-color: #2b1d12;
+  border: 1px solid #4e342e;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.table {
+  color: #413636 !important;
+  border-color: #4e342e;
+  background-color: #d7ccc8 !important;
+}
+
+.table thead {
+  background-color: #4e342e;
+}
+
+.form-control {
+  background-color: #3e2723;
+  border: 1px solid #5d4037;
+  color: rgb(141, 134, 134) !important;
+}
+
+.form-control:focus {
+  background-color: #4e342e;
+  border-color: #8d6e63;
+  box-shadow: 0 0 0 0.25 metric rgba(141, 110, 99, 0.25);
+  color: rgb(44, 34, 34);
+}
+
+.btn-primary {
+  background-color: #8d6e63 !important;
+  border-color: #8d6e63 !important;
+}
+
+.btn-primary:hover {
+  background-color: #a1887f !important;
+}
+
+.btn-success {
+  background-color: #5d4037 !important;
+  border-color: #8d6e63 !important;
+}
+
+.text-muted {
+  color: #a1887f !important;
+}

@@ -137,65 +137,105 @@ function ListasTracks() {
     );
 
   return (
-    <div className="container mt-5">
-      <h2 className="mb-4">Studio Track Manager</h2>
+    <div className="container py-5">
+      <div className="row justify-content-center">
+        <div className="col-md-10 card-estudio p-4">
+          <div
+            className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3"
+            style={{ borderColor: "#4e342e" }}
+          >
+            <h2 className="fw-bold mb-0" style={{ color: "#d7ccc8" }}>
+              <i className="bi bi-music-note-beamed me-2"></i>
+              Studio Track Manager
+            </h2>
+            <span
+              className="badge rounded-pill"
+              style={{ backgroundColor: "#4e342e" }}
+            >
+              {tracks.length} Tracks en total
+            </span>
+          </div>
 
-      {/* Formulario de entrada con Bootstrap */}
-      <div className="input-group mb-4">
-        <input
-          className="form-control"
-          type="text"
-          placeholder="Nombre del track"
-          value={title}
-          onChange={(e) => setTitulo(e.target.value)}
-          onKeyDown={
-            edit
-              ? (e) => e.key === "Enter" && guardarCambios()
-              : (e) => e.key === "Enter" && añadirTrack()
-          }
-        />
-        <input
-          className="form-control"
-          style={{ maxWidth: "100px" }}
-          type="number"
-          value={bpm}
-          onChange={(e) => setBpm(Number(e.target.value))}
-        />
-        <button
-          className={edit ? "btn btn-success" : "btn btn-primary"}
-          onClick={edit ? guardarCambios : añadirTrack}
-        >
-          {edit ? "Guardar Cambios" : "Añadir Track"}
-        </button>
-        {edit && <button onClick={cancelar}>Cancelar</button>}
-      </div>
+          {/* Formulario de entrada */}
+          <div className="row g-2 mb-5 bg-dark bg-opacity-25 p-3 rounded shadow-sm">
+            <div className="col-md-7">
+              <input
+                className="form-control form-control-lg"
+                type="text"
+                placeholder="Nombre del track..."
+                value={title}
+                onChange={(e) => setTitulo(e.target.value)}
+              />
+            </div>
+            <div className="col-md-2">
+              <div className="input-group">
+                <span className="input-group-text bg-transparent text-white border-secondary">
+                  BPM
+                </span>
+                <input
+                  className="form-control form-control-lg"
+                  type="number"
+                  value={bpm}
+                  onChange={(e) => setBpm(Number(e.target.value))}
+                />
+              </div>
+            </div>
+            <div className="col-md-3 d-grid">
+              <button
+                className={
+                  edit ? "btn btn-success btn-lg" : "btn btn-primary btn-lg"
+                }
+                onClick={edit ? guardarCambios : añadirTrack}
+              >
+                {edit ? "Actualizar" : "Añadir Track"}
+              </button>
+            </div>
+            {edit && (
+              <div className="col-12 mt-2">
+                <button
+                  className="btn btn-link text-white-50 btn-sm"
+                  onClick={cancelar}
+                >
+                  Cancelar edición
+                </button>
+              </div>
+            )}
+          </div>
 
-      {/* La Tabla de Datos */}
-      <table className="table table-hover align-middle">
-        <thead className="table-dark">
-          <tr>
-            <th>ID</th>
-            <th>Título de la Canción</th>
-            <th>BPM</th>
-            <th className="text-end">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tracks.map((track) => (
-            <ItemTrack
-              key={track.idTrack}
-              id={track.idTrack}
-              titulo={track.title}
-              bpm={track.bpm}
-              onBorrar={() => borrarTrack(track.idTrack)}
-              onEditar={() => prepararEdicion(track)}
-            />
-          ))}
-        </tbody>
-      </table>
+          {/* Tabla de Datos */}
+          <div className="table-responsive">
+            <table className="table table-hover align-middle">
+              <thead style={{ borderBottom: "2px solid #8d6e63" }}>
+                <tr className="text-uppercase small ls-wide">
+                  <th className="py-3">ID</th>
+                  <th className="py-3">Título de la Canción</th>
+                  <th className="py-3 text-center">BPM</th>
+                  <th className="py-3 text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tracks.map((track) => (
+                  <ItemTrack
+                    key={track.idTrack}
+                    id={track.idTrack}
+                    titulo={track.title}
+                    bpm={track.bpm}
+                    onBorrar={() => borrarTrack(track.idTrack)}
+                    onEditar={() => prepararEdicion(track)}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-      <div className="mt-3 text-muted">
-        <ContadorFrutas numero={tracks.length} />
+          <div
+            className="mt-4 pt-3 border-top d-flex justify-content-between"
+            style={{ borderColor: "#4e342e" }}
+          >
+            <ContadorFrutas numero={tracks.length} />
+            <small className="text-muted">v1.0 Powered by Java & React</small>
+          </div>
+        </div>
       </div>
     </div>
   );

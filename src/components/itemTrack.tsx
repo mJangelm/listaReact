@@ -9,17 +9,19 @@ interface ItemTrackProps {
 function ItemTrack({ id, titulo, bpm, onBorrar, onEditar }: ItemTrackProps) {
   return (
     <tr>
-      <td>{id}</td>
-      <td>{titulo}</td>
-      <td>{bpm}</td>
+      <td className="text-center">{id}</td>
+      <td className="fw-bold">{titulo}</td>
+      <td className="text-center">{bpm}</td>
       <td>
-        <button className="btn btn-danger btn-sm" onClick={onBorrar}>
-          Eliminar
-        </button>
-        <br></br>
-        <button className="btn btn-warning btn-sm mt-3" onClick={onEditar}>
-          Editar
-        </button>
+        {/* Usamos d-flex para alinear y gap para separar */}
+        <div className="d-flex justify-content-center gap-2">
+          <button className="btn btn-danger btn-sm" onClick={onBorrar}>
+            Eliminar
+          </button>
+          <button className="btn btn-warning btn-sm" onClick={onEditar}>
+            Editar
+          </button>
+        </div>
       </td>
     </tr>
   );
