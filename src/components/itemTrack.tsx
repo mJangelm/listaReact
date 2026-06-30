@@ -2,15 +2,24 @@ interface ItemTrackProps {
   id: number;
   titulo: string;
   bpm: number;
+  genero: string;
   onBorrar: () => void; // Una función que no devuelve nada
   onEditar: () => void;
 }
 
-function ItemTrack({ id, titulo, bpm, onBorrar, onEditar }: ItemTrackProps) {
+function ItemTrack({
+  id,
+  titulo,
+  bpm,
+  genero,
+  onBorrar,
+  onEditar,
+}: ItemTrackProps) {
   return (
     <tr>
       <td className="text-center">{id}</td>
       <td className="fw-bold">{titulo}</td>
+      <td className="fw-bold">{genero}</td>
       <td className="text-center">{bpm}</td>
       <td>
         {/* Usamos d-flex para alinear y gap para separar */}

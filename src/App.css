@@ -75,6 +75,34 @@ body,
   background-color: #4e342e;
 }
 
+/* Customización sobre la clase .table de Bootstrap */
+.table-estudio {
+  --bs-table-bg: #d7ccc8; /* Marrón claro tipo arena */
+  --bs-table-color: #2b1d12; /* Texto marrón oscuro */
+  border: 2px solid #5d4037 !important; /* Borde exterior grueso */
+}
+
+/* Bordes para cada celda individual */
+.table-estudio th,
+.table-estudio td {
+  border: 1px solid #5d4037 !important; /* Borde chocolate en cada celda */
+  vertical-align: middle;
+}
+
+/* Estilo para la cabecera */
+.table-estudio thead th {
+  background-color: #4e342e !important; /* Marrón chocolate oscuro */
+  color: #ffffff !important; /* Letras blancas en la cabecera */
+  border-bottom: 2px solid #2b1d12 !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Efecto al pasar el ratón (Hover) */
+.table-estudio tbody tr:hover {
+  background-color: #bcaaa4 !important; /* Un tono un poco más oscuro al pasar el ratón */
+  transition: background-color 0.2s ease;
+}
 .form-control {
   background-color: #3e2723;
   border: 1px solid #5d4037;
