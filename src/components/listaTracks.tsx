@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import ItemTrack from "./itemTrack";
-import ContadorFrutas from "./ContadorFrutas";
+import FiltrosGeneros from "../components/FiltroGeneros";
+import FormularioTrack from "../components/TrackForm";
+import TablaTracks from "./TablaTracks";
+import FooterStudio from "./FooterStudio";
 
-// 1. Interfaz de TypeScript actualizada con el nuevo campo
-interface Track {
+export interface Track {
   idTrack: number;
   title: string;
   bpm: number;
@@ -15,14 +16,10 @@ function ListasTracks() {
   const [title, setTitulo] = useState("");
   const [edit, setEdit] = useState<number | null>(null);
   const [bpm, setBpm] = useState(120);
-
-  // Estados añadidos para la gestión del género
   const [genero, setGenero] = useState("");
   const [generoFiltro, setGeneroFiltro] = useState<string>("TODOS");
-
   const [cargando, setCargando] = useState(true);
 
-  // Hook useEffect que reacciona de forma automática cada vez que cambia el filtro
   useEffect(() => {
     const url =
       generoFiltro === "TODOS"
@@ -48,7 +45,6 @@ function ListasTracks() {
       return;
     }
 
-    // Enviamos el objeto mapeado exactamente igual que la entidad de Java
     const nuevoTrack = {
       title: title,
       bpm: bpm,
@@ -57,9 +53,7 @@ function ListasTracks() {
 
     fetch("http://localhost:8087/alta", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(nuevoTrack),
     })
       .then((res) => {
@@ -67,31 +61,22 @@ function ListasTracks() {
         return res.json();
       })
       .then((trackGuardado) => {
-        // Añadimos a la vista solo si encaja en el filtro activo actual
         if (
           generoFiltro === "TODOS" ||
           generoFiltro.toLowerCase() === trackGuardado.genero.toLowerCase()
         ) {
           setTracks([...tracks, trackGuardado]);
         }
-
-        // Limpieza de inputs
-        setTitulo("");
-        setBpm(120);
-        setGenero("");
+        resetFormulario();
       })
       .catch((err) => {
         console.error("Hubo un problema con la operación fetch:", err);
-        alert(
-          "No se pudo conectar con el servidor. Revisa si Java está corriendo.",
-        );
+        alert("No se pudo conectar con el servidor.");
       });
   };
 
   const borrarTrack = (idABorrar: number) => {
-    fetch(`http://localhost:8087/${idABorrar}`, {
-      method: "DELETE",
-    })
+    fetch(`http://localhost:8087/${idABorrar}`, { method: "DELETE" })
       .then((res) => {
         if (res.ok) {
           setTracks(tracks.filter((track) => track.idTrack !== idABorrar));
@@ -109,7 +94,7 @@ function ListasTracks() {
     setEdit(track.idTrack);
   };
 
-  const cancelar = () => {
+  const resetFormulario = () => {
     setEdit(null);
     setTitulo("");
     setBpm(120);
@@ -125,18 +110,16 @@ function ListasTracks() {
     });
 
     setTracks(tracksActualizados);
-    setEdit(null);
-    setTitulo("");
-    setBpm(120);
-    setGenero("");
+    resetFormulario();
   };
 
-  if (cargando)
+  if (cargando) {
     return (
       <div className="container mt-5">
         <h1 className="text-white">Cargando estudio...</h1>
       </div>
     );
+  }
 
   return (
     <div className="container py-5">
@@ -159,129 +142,31 @@ function ListasTracks() {
             </span>
           </div>
 
-          {/* BOTONES DE FILTRADO RÁPIDO */}
-          <div className="mb-4 d-flex gap-2">
-            <button
-              className={`btn btn-sm ${generoFiltro === "TODOS" ? "btn-light" : "btn-outline-light"}`}
-              onClick={() => setGeneroFiltro("TODOS")}
-            >
-              Todos
-            </button>
-            <button
-              className={`btn btn-sm ${generoFiltro === "Death Metal" ? "btn-light" : "btn-outline-light"}`}
-              onClick={() => setGeneroFiltro("Death Metal")}
-            >
-              Death Metal
-            </button>
-            <button
-              className={`btn btn-sm ${generoFiltro === "Thrash" ? "btn-light" : "btn-outline-light"}`}
-              onClick={() => setGeneroFiltro("Thrash")}
-            >
-              Thrash
-            </button>
-          </div>
+          <FiltrosGeneros
+            generoFiltro={generoFiltro}
+            setGeneroFiltro={setGeneroFiltro}
+          />
 
-          {/* Formulario de entrada */}
-          <div className="row g-2 mb-5 bg-dark bg-opacity-25 p-3 rounded shadow-sm">
-            <div className="col-md-5">
-              <input
-                className="form-control form-control-lg"
-                type="text"
-                placeholder="Nombre del track..."
-                value={title}
-                onChange={(e) => setTitulo(e.target.value)}
-              />
-            </div>
+          <FormularioTrack
+            title={title}
+            setTitulo={setTitulo}
+            genero={genero}
+            setGenero={setGenero}
+            bpm={bpm}
+            setBpm={setBpm}
+            edit={edit}
+            onGuardar={guardarCambios}
+            onAñadir={añadirTrack}
+            onCancelar={resetFormulario}
+          />
 
-            {/* INPUT NUEVO PARA EL GÉNERO */}
-            <div className="col-md-3">
-              <input
-                className="form-control form-control-lg"
-                type="text"
-                placeholder="Género (Ej: Death Metal)..."
-                value={genero}
-                onChange={(e) => setGenero(e.target.value)}
-              />
-            </div>
+          <TablaTracks
+            tracks={tracks}
+            onBorrar={borrarTrack}
+            onEditar={prepararEdicion}
+          />
 
-            <div className="col-md-2">
-              <div className="input-group">
-                <span className="input-group-text bg-transparent text-white border-secondary">
-                  BPM
-                </span>
-                <input
-                  className="form-control form-control-lg"
-                  type="number"
-                  value={bpm}
-                  onChange={(e) => setBpm(Number(e.target.value))}
-                />
-              </div>
-            </div>
-            <div className="col-md-2 d-grid">
-              <button
-                className={
-                  edit ? "btn btn-success btn-lg" : "btn btn-primary btn-lg"
-                }
-                onClick={edit ? guardarCambios : añadirTrack}
-              >
-                {edit ? "Actualizar" : "Añadir"}
-              </button>
-            </div>
-            {edit && (
-              <div className="col-12 mt-2">
-                <button
-                  className="btn btn-link text-white-50 btn-sm"
-                  onClick={cancelar}
-                >
-                  Cancelar edición
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Tabla de Datos */}
-          <div className="table-responsive">
-            <table className="table table-hover align-middle">
-              <thead style={{ borderBottom: "2px solid #8d6e63" }}>
-                <tr className="text-uppercase small ls-wide">
-                  <th className="py-3">ID</th>
-                  <th className="py-3">Título de la Canción</th>
-                  <th className="py-3">Género</th>
-                  <th className="py-3 text-center">BPM</th>
-                  <th className="py-3 text-center">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tracks.map((track) => (
-                  <ItemTrack
-                    key={track.idTrack}
-                    id={track.idTrack}
-                    titulo={track.title}
-                    genero={track.genero}
-                    bpm={track.bpm}
-                    onBorrar={() => borrarTrack(track.idTrack)}
-                    onEditar={() => prepararEdicion(track)}
-                  />
-                ))}
-              </tbody>
-            </table>
-            {tracks.length === 0 && (
-              <p className="text-center text-muted my-4">
-                No hay tracks para mostrar con este filtro.
-              </p>
-            )}
-          </div>
-
-          {/* Footer */}
-          <div
-            className="mt-4 pt-3 border-top d-flex justify-content-between"
-            style={{ borderColor: "#4e342e" }}
-          >
-            <ContadorFrutas numero={tracks.length} />
-            <small className="text-muted">
-              v1.1 Powered by Java Streams & React
-            </small>
-          </div>
+          <FooterStudio totalTracks={tracks.length} />
         </div>
       </div>
     </div>
