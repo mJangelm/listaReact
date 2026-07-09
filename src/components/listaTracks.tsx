@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import FiltrosGeneros from "../components/FiltroGeneros";
 import FormularioTrack from "../components/TrackForm";
 import TablaTracks from "./TablaTracks";
-import FooterStudio from "./FooterStudio";
 
 export interface Track {
   idTrack: number;
@@ -165,8 +164,6 @@ function ListasTracks() {
             onBorrar={borrarTrack}
             onEditar={prepararEdicion}
           />
-
-          <FooterStudio totalTracks={tracks.length} />
         </div>
       </div>
     </div>
