@@ -12,20 +12,15 @@ export function useTracks() {
   const [title, setTitulo] = useState("");
   const [bpm, setBpm] = useState(120);
   const [genero, setGenero] = useState("");
-  const [generoFiltro, setGeneroFiltro] = useState<string>("TODOS");
   const [buscaGenero, setBuscaGenero] = useState("");
   const [edit, setEdit] = useState<number | null>(null);
   const [cargando, setCargando] = useState(true);
 
-  // Cargar tracks por filtro
+  // Cargar todos los tracks una vez al montar; el filtrado por género
+  // se hace en memoria más abajo con tracksFiltrados
   useEffect(() => {
-    const url =
-      generoFiltro === "TODOS"
-        ? "http://localhost:8087/"
-        : `http://localhost:8087/genero/${generoFiltro}`;
-
     setCargando(true);
-    fetch(url)
+    fetch("http://localhost:8087/")
       .then((res) => res.json())
       .then((data) => {
         setTracks(data);
@@ -35,11 +30,19 @@ export function useTracks() {
         console.error("Error conectando con Java:", err);
         setCargando(false);
       });
-  }, [generoFiltro]);
+  }, []);
 
   const añadirTrack = () => {
     if (title.trim() === "") {
       alert("El título no puede estar vacío");
+      return;
+    }
+
+    const existeDuplicado = tracks.some(
+      (t) => t.title.toLowerCase() === title.toLowerCase(),
+    );
+    if (existeDuplicado) {
+      alert("Ese título ya existe");
       return;
     }
 
@@ -59,12 +62,7 @@ export function useTracks() {
         return res.json();
       })
       .then((trackGuardado) => {
-        if (
-          generoFiltro === "TODOS" ||
-          generoFiltro.toLowerCase() === trackGuardado.genero.toLowerCase()
-        ) {
-          setTracks([...tracks, trackGuardado]);
-        }
+        setTracks((prev) => [...prev, trackGuardado]);
         limpiarFormulario();
       })
       .catch((err) => console.error("Error al añadir:", err));
@@ -74,7 +72,9 @@ export function useTracks() {
     fetch(`http://localhost:8087/${idABorrar}`, { method: "DELETE" })
       .then((res) => {
         if (res.ok) {
-          setTracks(tracks.filter((track) => track.idTrack !== idABorrar));
+          setTracks((prev) =>
+            prev.filter((track) => track.idTrack !== idABorrar),
+          );
         }
       })
       .catch((err) => console.error("Error al borrar:", err));
@@ -125,8 +125,6 @@ export function useTracks() {
   return {
     tracks: tracksFiltrados,
     cargando,
-    generoFiltro,
-    setGeneroFiltro,
     buscaGenero,
     setBuscaGenero,
     form: { title, setTitulo, bpm, setBpm, genero, setGenero, edit },

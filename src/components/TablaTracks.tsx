@@ -1,6 +1,5 @@
 import ItemTrack from "./itemTrack";
-import { Track } from "../components/listaTracks"; // Asegúrate de ajustar la ruta de la interfaz
-
+import { Track } from "./listaTracks";
 interface TablaTracksProps {
   tracks: Track[];
   onBorrar: (id: number) => void;
@@ -13,7 +12,6 @@ function TablaTracks({ tracks, onBorrar, onEditar }: TablaTracksProps) {
       <table className="table table-hover align-middle">
         <thead style={{ borderBottom: "2px solid #8d6e63" }}>
           <tr className="text-uppercase small ls-wide">
-            <th className="py-3">ID</th>
             <th className="py-3">Título de la Canción</th>
             <th className="py-3">Género</th>
             <th className="py-3 text-center">BPM</th>

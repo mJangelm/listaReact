@@ -6,16 +6,8 @@ import { useTracks } from "./hooks/useTracks";
 export type { Track } from "./hooks/useTracks";
 
 function ListasTracks() {
-  const {
-    tracks,
-    cargando,
-    generoFiltro,
-    setGeneroFiltro,
-    buscaGenero,
-    setBuscaGenero,
-    form,
-    acciones,
-  } = useTracks();
+  const { tracks, cargando, buscaGenero, setBuscaGenero, form, acciones } =
+    useTracks();
 
   if (cargando) {
     return (
@@ -47,8 +39,6 @@ function ListasTracks() {
           </div>
 
           <FiltrosGeneros
-            generoFiltro={generoFiltro}
-            setGeneroFiltro={setGeneroFiltro}
             buscaGenero={buscaGenero}
             setBuscaGenero={setBuscaGenero}
           />
