@@ -13,6 +13,7 @@ export function useTracks() {
   const [bpm, setBpm] = useState(120);
   const [genero, setGenero] = useState("");
   const [generoFiltro, setGeneroFiltro] = useState<string>("TODOS");
+  const [buscaGenero, setBuscaGenero] = useState("");
   const [edit, setEdit] = useState<number | null>(null);
   const [cargando, setCargando] = useState(true);
 
@@ -87,15 +88,26 @@ export function useTracks() {
   };
 
   const guardarCambios = () => {
-    const tracksActualizados = tracks.map((t) => {
-      if (t.idTrack === edit) {
-        return { ...t, title, bpm, genero };
-      }
-      return t;
-    });
+    if (edit === null) return;
 
-    setTracks(tracksActualizados);
-    limpiarFormulario();
+    const trackActualizado = { idTrack: edit, title, bpm, genero };
+
+    fetch(`http://localhost:8087/${edit}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(trackActualizado),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Error en el servidor al actualizar");
+        return res.json();
+      })
+      .then((trackGuardado) => {
+        setTracks((prev) =>
+          prev.map((t) => (t.idTrack === edit ? trackGuardado : t)),
+        );
+        limpiarFormulario();
+      })
+      .catch((err) => console.error("Error al actualizar:", err));
   };
 
   const limpiarFormulario = () => {
@@ -105,11 +117,18 @@ export function useTracks() {
     setGenero("");
   };
 
+  // Filtrado en memoria sobre lo que ya tenemos cargado (sin tocar el backend)
+  const tracksFiltrados = tracks.filter((t) =>
+    t.genero.toLowerCase().includes(buscaGenero.toLowerCase()),
+  );
+
   return {
-    tracks,
+    tracks: tracksFiltrados,
     cargando,
     generoFiltro,
     setGeneroFiltro,
+    buscaGenero,
+    setBuscaGenero,
     form: { title, setTitulo, bpm, setBpm, genero, setGenero, edit },
     acciones: {
       añadirTrack,
