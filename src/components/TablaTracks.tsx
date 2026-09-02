@@ -4,9 +4,10 @@ interface TablaTracksProps {
   tracks: Track[];
   onBorrar: (id: number) => void;
   onEditar: (track: Track) => void;
+  mostrarPropietario?: boolean;
 }
 
-function TablaTracks({ tracks, onBorrar, onEditar }: TablaTracksProps) {
+function TablaTracks({ tracks, onBorrar, onEditar, mostrarPropietario }: TablaTracksProps) {
   return (
     <div className="table-responsive">
       <table className="table table-hover align-middle">
@@ -15,6 +16,7 @@ function TablaTracks({ tracks, onBorrar, onEditar }: TablaTracksProps) {
             <th className="py-3">Título de la Canción</th>
             <th className="py-3">Género</th>
             <th className="py-3 text-center">BPM</th>
+            {mostrarPropietario && <th className="py-3">Propietario</th>}
             <th className="py-3 text-center">Acciones</th>
           </tr>
         </thead>
@@ -26,6 +28,7 @@ function TablaTracks({ tracks, onBorrar, onEditar }: TablaTracksProps) {
               titulo={track.title}
               genero={track.genero}
               bpm={track.bpm}
+              propietario={mostrarPropietario ? track.usuarioUsername : undefined}
               onBorrar={() => onBorrar(track.idTrack)}
               onEditar={() => onEditar(track)}
             />

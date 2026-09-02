@@ -27,6 +27,7 @@ function FormularioTrack({
     <div className="row g-2 mb-5 bg-dark bg-opacity-25 p-3 rounded shadow-sm">
       <div className="col-md-5">
         <input
+          data-testid="input-titulo"
           className="form-control form-control-lg"
           type="text"
           placeholder="Nombre del track..."
@@ -37,6 +38,7 @@ function FormularioTrack({
 
       <div className="col-md-3">
         <input
+          data-testid="input-genero"
           className="form-control form-control-lg"
           type="text"
           placeholder="Género (Ej: Death Metal)..."
@@ -51,6 +53,7 @@ function FormularioTrack({
             BPM
           </span>
           <input
+            data-testid="input-bpm"
             className="form-control form-control-lg"
             type="number"
             value={bpm}

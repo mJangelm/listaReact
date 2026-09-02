@@ -3,6 +3,7 @@ interface ItemTrackProps {
   titulo: string;
   bpm: number;
   genero: string;
+  propietario?: string;
   onBorrar: () => void; // Una función que no devuelve nada
   onEditar: () => void;
 }
@@ -13,6 +14,7 @@ function ItemTrack(props: ItemTrackProps) {
       <td className="fw-bold">{props.titulo}</td>
       <td className="fw-bold">{props.genero}</td>
       <td className="text-center">{props.bpm}</td>
+      {props.propietario !== undefined && <td>{props.propietario}</td>}
       <td>
         {/* Usamos d-flex para alinear y gap para separar */}
         <div className="d-flex justify-content-center gap-2">

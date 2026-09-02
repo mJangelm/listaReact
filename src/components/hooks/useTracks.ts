@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import { apiFetch } from "../../api/http";
 
 export interface Track {
   idTrack: number;
   title: string;
   bpm: number;
   genero: string;
+  usuarioUsername?: string;
 }
 
 export function useTracks() {
@@ -16,11 +18,9 @@ export function useTracks() {
   const [edit, setEdit] = useState<number | null>(null);
   const [cargando, setCargando] = useState(true);
 
-  // Cargar todos los tracks una vez al montar; el filtrado por género
-  // se hace en memoria más abajo con tracksFiltrados
   useEffect(() => {
     setCargando(true);
-    fetch("http://localhost:8087/")
+    apiFetch("/")
       .then((res) => res.json())
       .then((data) => {
         setTracks(data);
@@ -52,32 +52,44 @@ export function useTracks() {
       genero: genero.trim() === "" ? "Por definir" : genero,
     };
 
-    fetch("http://localhost:8087/alta", {
+    apiFetch("/alta", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(nuevoTrack),
     })
       .then((res) => {
-        if (!res.ok) throw new Error("Error en el servidor");
+        if (!res.ok) {
+          return res.text().then((mensaje) => {
+            throw new Error(mensaje);
+          });
+        }
         return res.json();
       })
       .then((trackGuardado) => {
         setTracks((prev) => [...prev, trackGuardado]);
         limpiarFormulario();
       })
-      .catch((err) => console.error("Error al añadir:", err));
+      .catch((err) => {
+        console.error("Error al añadir:", err);
+        alert(err.message);
+      });
   };
 
   const borrarTrack = (idABorrar: number) => {
-    fetch(`http://localhost:8087/${idABorrar}`, { method: "DELETE" })
+    apiFetch(`/${idABorrar}`, { method: "DELETE" })
       .then((res) => {
-        if (res.ok) {
-          setTracks((prev) =>
-            prev.filter((track) => track.idTrack !== idABorrar),
-          );
+        if (!res.ok) {
+          return res.text().then((mensaje) => {
+            throw new Error(mensaje);
+          });
         }
+        setTracks((prev) =>
+          prev.filter((track) => track.idTrack !== idABorrar),
+        );
       })
-      .catch((err) => console.error("Error al borrar:", err));
+      .catch((err) => {
+        console.error("Error al borrar:", err);
+        alert(err.message);
+      });
   };
 
   const prepararEdicion = (track: Track) => {
@@ -92,13 +104,16 @@ export function useTracks() {
 
     const trackActualizado = { idTrack: edit, title, bpm, genero };
 
-    fetch(`http://localhost:8087/${edit}`, {
+    apiFetch(`/${edit}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(trackActualizado),
     })
       .then((res) => {
-        if (!res.ok) throw new Error("Error en el servidor al actualizar");
+        if (!res.ok) {
+          return res.text().then((mensaje) => {
+            throw new Error(mensaje);
+          });
+        }
         return res.json();
       })
       .then((trackGuardado) => {
@@ -107,7 +122,10 @@ export function useTracks() {
         );
         limpiarFormulario();
       })
-      .catch((err) => console.error("Error al actualizar:", err));
+      .catch((err) => {
+        console.error("Error al actualizar:", err);
+        alert(err.message);
+      });
   };
 
   const limpiarFormulario = () => {
@@ -117,7 +135,6 @@ export function useTracks() {
     setGenero("");
   };
 
-  // Filtrado en memoria sobre lo que ya tenemos cargado (sin tocar el backend)
   const tracksFiltrados = tracks.filter((t) =>
     t.genero.toLowerCase().includes(buscaGenero.toLowerCase()),
   );

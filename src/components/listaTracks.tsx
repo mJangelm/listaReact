@@ -1,3 +1,4 @@
+import { useAuth } from "../auth/AuthContext";
 import FiltrosGeneros from "./FiltroGeneros";
 import FormularioTrack from "./TrackForm";
 import TablaTracks from "./TablaTracks";
@@ -8,6 +9,7 @@ export type { Track } from "./hooks/useTracks";
 function ListasTracks() {
   const { tracks, cargando, buscaGenero, setBuscaGenero, form, acciones } =
     useTracks();
+  const { user } = useAuth();
 
   if (cargando) {
     return (
@@ -60,6 +62,7 @@ function ListasTracks() {
             tracks={tracks}
             onBorrar={acciones.borrarTrack}
             onEditar={acciones.prepararEdicion}
+            mostrarPropietario={user?.role === "ADMIN"}
           />
         </div>
       </div>
